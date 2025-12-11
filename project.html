@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vision Board & Progress Timeline Tracker</title>
+    <style>
+        /* CSS for Styling and Layout */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+        }
+
+        /* --- Vision Board Styles --- */
+        .vision-board {
+            flex: 1; /* Takes up 1 part of the space */
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .vision-board h2 {
+            color: #4CAF50;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .vision-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            background-color: #f9f9f9;
+        }
+
+        .vision-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .vision-item h3 {
+            margin-top: 0;
+            color: #3f51b5;
+        }
+
+        /* --- Timeline Tracker Styles --- */
+        .timeline-tracker {
+            flex: 2; /* Takes up 2 parts of the space (wider) */
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-tracker h2 {
+            color: #2196F3;
+            border-bottom: 3px solid #2196F3;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        /* The vertical line */
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background-color: #eee;
+            top: 0;
+            bottom: 0;
+            left: 31px; /* Position the line */
+            margin-left: -3px;
+        }
+
+        .timeline-event {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            margin-left: 20px;
+        }
+
+        /* The dots on the timeline */
+        .timeline-event::after {
+            content: '';
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            right: auto;
+            background-color: white;
+            border: 4px solid #FF9800; /* Default color */
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+            left: 18px; /* Align with the vertical line */
+        }
+
+        /* Style for Completed events */
+        .timeline-event.completed::after {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .timeline-event.completed .status {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        /* Style for In-Progress events */
+        .timeline-event.in-progress::after {
+            background-color: #FFC107;
+            border-color: #FFC107;
+        }
+
+        .timeline-event.in-progress .status {
+            color: #FFC107;
+            font-weight: bold;
+        }
+
+        .timeline-event-content {
+            padding: 20px 30px;
+            background-color: #e3f2fd;
+            position: relative;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-event-content h4 {
+            margin-top: 0;
+            color: #0d47a1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <section class="vision-board">
+            <h2>🎯 My Long-Term Vision</h2>
+            <p>**Goals to anchor all timeline progress.**</p>
+            
+            <div class="vision-item">
+                <h3>Goal 1: Become a Certified Software Engineer</h3>
+                <p>Target: Complete all final-year projects and secure a good job offer by May 2026.</p>
+            </div>
+            <div class="vision-item">
+                <h3>Goal 2: Master Full-Stack Development</h3>
+                <p>Target: Successfully deploy a complete MERN/LAMP stack application with 1000+ active users.</p>
+            </div>
+        </section>
+
+        <section class="timeline-tracker">
+            <h2>⏳ Project Progress Timeline</h2>
+            <p>**A detailed tracker for project milestones.**</p>
+            
+
+[Image of a project timeline with milestones]
+
+            <div class="timeline" id="project-timeline">
+                <div class="timeline-event completed" data-status="completed">
+                    <div class="timeline-event-content">
+                        <h4>Milestone 1: Project Proposal & Setup</h4>
+                        <p>Defined scope, chose tech stack (HTML/CSS/JS), and set up GitHub repository.</p>
+                        <small>Date: Oct 2025 | Status: <span class="status">Completed</span></small>
+                    </div>
+                </div>
+
+                <div class="timeline-event in-progress" data-status="in-progress">
+                    <div class="timeline-event-content">
+                        <h4>Milestone 2: Initial UI/UX Design & HTML Structure</h4>
+                        <p>Developed core HTML structure, applied basic CSS styling for layout and responsiveness.</p>
+                        <small>Date: Nov 2025 | Status: <span class="status">In Progress</span></small>
+                    </div>
+                </div>
+
+                <div class="timeline-event" data-status="pending">
+                    <div class="timeline-event-content">
+                        <h4>Milestone 3: JavaScript Interactivity (Progress Update Functionality)</h4>
+                        <p>Implement functions to dynamically update task status and save progress.</p>
+                        <small>Date: Dec 2025 | Status: <span class="status">Pending</span></small>
+                    </div>
+                </div>
+
+                <div class="timeline-event" data-status="pending">
+                    <div class="timeline-event-content">
+                        <h4>Milestone 4: Final Review & Deployment</h4>
+                        <p>Code cleanup, final testing, and deployment to a live platform like GitHub Pages.</p>
+                        <small>Date: Jan 2026 | Status: <span class="status">Pending</span></small>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // JavaScript for basic interactivity (optional but highly recommended)
+
+        const events = document.querySelectorAll('.timeline-event');
+
+        events.forEach(event => {
+            event.addEventListener('click', function() {
+                // Get current status from the data attribute
+                let currentStatus = this.getAttribute('data-status');
+                let newStatus;
+
+                // Simple state machine for cycling through statuses
+                if (currentStatus === 'pending') {
+                    newStatus = 'in-progress';
+                } else if (currentStatus === 'in-progress') {
+                    newStatus = 'completed';
+                } else {
+                    newStatus = 'pending';
+                }
+
+                // Update data attribute and class list for styling
+                this.setAttribute('data-status', newStatus);
+                this.className = 'timeline-event ' + newStatus;
+
+                // Update the visible status text
+                const statusSpan = this.querySelector('.status');
+                statusSpan.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1).replace('-', ' ');
+
+                alert(`Task status updated to: ${newStatus.toUpperCase()}`);
+            });
+        });
+
+        // Add a note about the JS functionality
+        console.log("Timeline events are clickable to cycle through status: Pending -> In Progress -> Completed");
+    </script>
+
+</body>
+</html>
