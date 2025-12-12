@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dream & Achieve: Vision Board + Tracker</title>
+    <style>
+        :root {
+            --primary: #6C63FF;
+            --secondary: #FF6584;
+            --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-main: #2d3436;
+            --text-light: #636e72;
+            --shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        /* Typography & Header */
+        header {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        h1 { font-size: 2.5rem; margin-bottom: 10px; color: var(--primary); }
+        h2 { font-size: 1.5rem; margin-bottom: 20px; position: relative; display: inline-block; }
+        h2::after {
+            content: '';
+            display: block;
+            width: 50%;
+            height: 3px;
+            background: var(--secondary);
+            margin: 5px auto 0;
+            border-radius: 2px;
+        }
+        p { color: var(--text-light); }
+
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* SECTION 1: VISION BOARD (Grid) */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 40px 0 20px 0;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(108, 99, 255, 0.3);
+            transition: transform 0.2s;
+        }
+        .btn:hover { transform: translateY(-2px); }
+
+        .vision-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .vision-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            position: relative;
+            transition: transform 0.3s;
+        }
+
+        .vision-card:hover { transform: translateY(-5px); }
+
+        .vision-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .vision-content { padding: 15px; }
+        .vision-title { font-weight: bold; margin-bottom: 5px; }
+        
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* SECTION 2: TIMELINE */
+        .timeline {
+            position: relative;
+            margin-top: 20px;
+            padding-left: 30px;
+            border-left: 3px solid #ddd;
+        }
+
+        .timeline-item {
+            margin-bottom: 30px;
+            position: relative;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        /* The dot on the timeline line */
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -38px;
+            top: 20px;
+            width: 14px;
+            height: 14px;
+            background: var(--secondary);
+            border-radius: 50%;
+            border: 3px solid #fff;
+        }
+
+        .timeline-date {
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .timeline-status {
+            float: right;
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        .status-pending { background: #eee; color: #666; }
+        .status-done { background: #d4edda; color: #155724; }
+
+        /* MODALS */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .modal-buttons { display: flex; gap: 10px; }
+        .btn-cancel { background: #eee; color: #333; }
+
+    </style>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <h1>✨ Vision & Progress</h1>
+        <p>Visualize your dreams, track your reality.</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- SECTION 1: VISION BOARD -->
+        <div class="section-header">
+            <h2>Vision Board</h2>
+            <button class="btn" onclick="openModal('visionModal')">+ Add Goal</button>
+        </div>
+        
+        <div class="vision-grid" id="visionBoard">
+            <!-- Vision Cards Injected Here -->
+        </div>
+
+        <!-- SECTION 2: TIMELINE -->
+        <div class="section-header" style="margin-top: 60px;">
+            <h2>Progress Timeline</h2>
+            <button class="btn" onclick="openModal('timelineModal')">+ Add Milestone</button>
+        </div>
+
+        <div class="timeline" id="timelineTracker">
+            <!-- Timeline Items Injected Here -->
+        </div>
+
+    </div>
+
+    <!-- ADD VISION MODAL -->
+    <div id="visionModal" class="modal">
+        <div class="modal-content">
+            <h3>New Vision Goal</h3>
+            <input type="text" id="vTitle" placeholder="Goal Title (e.g., Beach House)">
+            <input type="text" id="vImg" placeholder="Image URL (Paste from Unsplash/Pinterest)">
+            <div class="modal-buttons">
+                <button class="btn" onclick="addVision()">Add to Board</button>
+                <button class="btn btn-cancel" onclick="closeModal('visionModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD TIMELINE MODAL -->
+    <div id="timelineModal" class="modal">
+        <div class="modal-content">
+            <h3>New Milestone</h3>
+            <input type="text" id="tTitle" placeholder="Milestone (e.g., Saved $5,000)">
+            <input type="date" id="tDate">
+            <textarea id="tDesc" placeholder="Details or notes..." rows="3"></textarea>
+            <div class="modal-buttons">
+                <button class="btn" onclick="addTimeline()">Add to Timeline</button>
+                <button class="btn btn-cancel" onclick="closeModal('timelineModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Data Management ---
+        let visionData = JSON.parse(localStorage.getItem('visionBoardData')) || [];
+        let timelineData = JSON.parse(localStorage.getItem('timelineData')) || [];
+
+        const visionContainer = document.getElementById('visionBoard');
+        const timelineContainer = document.getElementById('timelineTracker');
+
+        // --- Render Functions ---
+
+        function renderVision() {
+            visionContainer.innerHTML = '';
+            visionData.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'vision-card';
+                card.innerHTML = `
+                    <button class="delete-btn" onclick="deleteVision(${index})">&times;</button>
+                    <img src="${item.image}" class="vision-img" onerror="this.src='https://via.placeholder.com/300?text=Dream'">
+                    <div class="vision-content">
+                        <div class="vision-title">${item.title}</div>
+                    </div>
+                `;
+                visionContainer.appendChild(card);
+            });
+        }
+
+        function renderTimeline() {
+            timelineContainer.innerHTML = '';
+            
+            // Sort by date (newest first)
+            timelineData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            timelineData.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'timeline-item';
+                
+                const statusClass = item.done ? 'status-done' : 'status-pending';
+                const statusText = item.done ? 'COMPLETED' : 'IN PROGRESS';
+
+                itemDiv.innerHTML = `
+                    <div class="timeline-date">${item.date}</div>
+                    <span class="timeline-status ${statusClass}" onclick="toggleStatus(${index})">${statusText}</span>
+                    <h3>${item.title}</h3>
+                    <p style="margin-top:5px; font-size:0.9rem;">${item.desc}</p>
+                    <button class="delete-btn" style="top:20px; right: 10px; background:transparent; color:#999;" onclick="deleteTimeline(${index})">🗑</button>
+                `;
+                timelineContainer.appendChild(itemDiv);
+            });
+        }
+
+        // --- Add/Delete Logic ---
+
+        function addVision() {
+            const title = document.getElementById('vTitle').value;
+            const img = document.getElementById('vImg').value;
+
+            if(title) {
+                visionData.push({ title, image: img });
+                saveData();
+                closeModal('visionModal');
+                document.getElementById('vTitle').value = '';
+                document.getElementById('vImg').value = '';
+            }
+        }
+
+        function addTimeline() {
+            const title = document.getElementById('tTitle').value;
+            const date = document.getElementById('tDate').value;
+            const desc = document.getElementById('tDesc').value;
+
+            if(title && date) {
+                timelineData.push({ title, date, desc, done: false });
+                saveData();
+                closeModal('timelineModal');
+                // Reset form
+                document.getElementById('tTitle').value = '';
+                document.getElementById('tDate').value = '';
+                document.getElementById('tDesc').value = '';
+            }
+        }
+
+        function deleteVision(index) {
+            if(confirm('Remove this goal?')) {
+                visionData.splice(index, 1);
+                saveData();
+            }
+        }
+
+        function deleteTimeline(index) {
+            if(confirm('Remove this milestone?')) {
+                timelineData.splice(index, 1);
+                saveData();
+            }
+        }
+
+        function toggleStatus(index) {
+            timelineData[index].done = !timelineData[index].done;
+            saveData();
+        }
+
+        // --- Utilities ---
+
+        function saveData() {
+            localStorage.setItem('visionBoardData', JSON.stringify(visionData));
+            localStorage.setItem('timelineData', JSON.stringify(timelineData));
+            renderVision();
+            renderTimeline();
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        // Close modal if clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // --- Initial Load ---
+        renderVision();
+        renderTimeline();
+
+    </script>
+</body>
+</html>
