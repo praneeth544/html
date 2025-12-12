@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizMaster - Community Platform</title>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --secondary: #10B981;
+            --bg: #F3F4F6;
+            --card: #FFFFFF;
+            --text: #1F2937;
+            --danger: #EF4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--primary);
+            padding: 1rem;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links button {
+            background: transparent;
+            border: none;
+            color: white;
+            margin-left: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .nav-links button:hover { background: rgba(255,255,255,0.2); }
+
+        /* Main Layout */
+        main {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; }
+        .view-section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        h2 { margin-bottom: 1.5rem; color: var(--primary); }
+
+        /* Buttons & Inputs */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--secondary); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        
+        input, select {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: block;
+        }
+
+        /* Quiz List */
+        .quiz-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .quiz-item:last-child { border-bottom: none; }
+
+        /* Builder Styles */
+        .question-builder {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px dashed #ccc;
+            margin-bottom: 1rem;
+        }
+
+        /* Game Styles */
+        .option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: #f0f0f0;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .option-btn:hover { background: #e5e5e5; }
+        .option-btn.correct { background: #d1fae5; border-color: var(--secondary); }
+        .option-btn.wrong { background: #fee2e2; border-color: var(--danger); }
+
+        /* Leaderboard Table */
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }
+        th { color: var(--text); font-weight: 600; }
+        
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-container">
+        <h1>🧠 QuizMaster</h1>
+        <div class="nav-links">
+            <button onclick="switchView('home')">Home</button>
+            <button onclick="switchView('builder')">Create Quiz</button>
+            <button onclick="switchView('leaderboard')">Leaderboard</button>
+        </div>
+    </div>
+</nav>
+
+<main>
+    <!-- HOME VIEW: List of Quizzes -->
+    <div id="home" class="view-section active">
+        <div class="card">
+            <h2>Available Quizzes</h2>
+            <div id="quizList">
+                <!-- Quizzes injected here -->
+            </div>
+            <p id="noQuizMsg" style="text-align:center; color:#888; display:none;">No quizzes yet. Be the first to create one!</p>
+        </div>
+    </div>
+
+    <!-- BUILDER VIEW: Create Quiz -->
+    <div id="builder" class="view-section">
+        <div class="card">
+            <h2>Create a New Quiz</h2>
+            <input type="text" id="newQuizTitle" placeholder="Quiz Title (e.g., JavaScript Basics)">
+            
+            <div id="questionsContainer"></div>
+            
+            <button class="btn btn-primary" onclick="addQuestionInputs()">+ Add Question</button>
+            <hr style="margin: 20px 0; border:0; border-top:1px solid #eee;">
+            <button class="btn btn-success" style="width:100%" onclick="saveQuiz()">Publish Quiz</button>
+        </div>
+    </div>
+
+    <!-- GAME VIEW: Play Quiz -->
+    <div id="game" class="view-section">
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; margin-bottom:1rem;">
+                <span id="gameTitle" style="font-weight:bold; color:var(--primary)"></span>
+                <span>Score: <span id="currentScore">0</span></span>
+            </div>
+            
+            <div id="questionArea">
+                <h3 id="questionText" style="margin-bottom:1.5rem; font-size:1.3rem;"></h3>
+                <div id="optionsArea"></div>
+            </div>
+
+            <div id="resultArea" style="display:none; text-align:center;">
+                <h2>Quiz Completed! 🎉</h2>
+                <p style="font-size:1.5rem; margin:1rem 0;">Your Score: <span id="finalScore"></span></p>
+                <div style="margin-bottom: 1rem;">
+                    <input type="text" id="playerName" placeholder="Enter your name to save score" style="max-width:300px; margin:0 auto;">
+                </div>
+                <button class="btn btn-success" onclick="saveScore()">Save to Leaderboard</button>
+                <button class="btn btn-primary" onclick="switchView('home')">Back to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LEADERBOARD VIEW -->
+    <div id="leaderboard" class="view-section">
+        <div class="card">
+            <h2>Global Leaderboard</h2>
+            <select id="leaderboardFilter" onchange="renderLeaderboard()" style="margin-bottom: 1rem;">
+                <option value="all">All Quizzes</option>
+                <!-- Options populated dynamically -->
+            </select>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Quiz</th>
+                        <th>Score</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                    <!-- Rows injected here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<script>
+    // --- STATE MANAGEMENT ---
+    let quizzes = JSON.parse(localStorage.getItem('qm_quizzes')) || [];
+    let scores = JSON.parse(localStorage.getItem('qm_scores')) || [];
+    
+    // Temporary state for the game
+    let currentQuiz = null;
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    // --- NAVIGATION ---
+    function switchView(viewId) {
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        document.getElementById(viewId).classList.add('active');
+        
+        if(viewId === 'home') renderQuizList();
+        if(viewId === 'leaderboard') renderLeaderboard();
+    }
+
+    // --- BUILDER LOGIC ---
+    let builderQuestions = [];
+
+    function addQuestionInputs() {
+        const container = document.getElementById('questionsContainer');
+        const qIndex = builderQuestions.length;
+        
+        const qHtml = `
+            <div class="question-builder" id="q-builder-${qIndex}">
+                <input type="text" placeholder="Question Text" class="q-text-${qIndex}">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <input type="text" placeholder="Option 1 (Correct Answer)" class="q-opt-${qIndex}-0" style="border-color:var(--secondary)">
+                    <input type="text" placeholder="Option 2" class="q-opt-${qIndex}-1">
+                    <input type="text" placeholder="Option 3" class="q-opt-${qIndex}-2">
+                    <input type="text" placeholder="Option 4" class="q-opt-${qIndex}-3">
+                </div>
+                <small style="color:#666;">* Option 1 is set as the correct answer by default, but answers will be shuffled during the game.</small>
+            </div>
+        `;
+        
+        // Add to DOM
+        const div = document.createElement('div');
+        div.innerHTML = qHtml;
+        container.appendChild(div);
+        
+        // Track count
+        builderQuestions.push(qIndex);
+    }
+
+    function saveQuiz() {
+        const title = document.getElementById('newQuizTitle').value;
+        if(!title) return alert("Please enter a quiz title");
+        if(builderQuestions.length === 0) return alert("Please add at least one question");
+
+        const questionsData = builderQuestions.map(idx => {
+            const text = document.querySelector(`.q-text-${idx}`).value;
+            const correct = document.querySelector(`.q-opt-${idx}-0`).value;
+            const wrong1 = document.querySelector(`.q-opt-${idx}-1`).value;
+            const wrong2 = document.querySelector(`.q-opt-${idx}-2`).value;
+            const wrong3 = document.querySelector(`.q-opt-${idx}-3`).value;
+
+            // Store raw options, we shuffle them at runtime
+            return {
+                text,
+                correct,
+                options: [correct, wrong1, wrong2, wrong3]
+            };
+        });
+
+        const newQuiz = {
+            id: Date.now(),
+            title,
+            questions: questionsData
+        };
+
+        quizzes.push(newQuiz);
+        localStorage.setItem('qm_quizzes', JSON.stringify(quizzes));
+        
+        // Reset form
+        document.getElementById('newQuizTitle').value = '';
+        document.getElementById('questionsContainer').innerHTML = '';
+        builderQuestions = [];
+        alert("Quiz Published!");
+        switchView('home');
+    }
+
+    // --- HOME LOGIC ---
+    function renderQuizList() {
+        const list = document.getElementById('quizList');
+        const msg = document.getElementById('noQuizMsg');
+        list.innerHTML = '';
+
+        if(quizzes.length === 0) {
+            msg.style.display = 'block';
+            return;
+        }
+        msg.style.display = 'none';
+
+        quizzes.forEach(quiz => {
+            const div = document.createElement('div');
+            div.className = 'quiz-item';
+            div.innerHTML = `
+                <div>
+                    <strong>${quiz.title}</strong>
+                    <span style="color:#666; font-size:0.9rem; margin-left:10px;">(${quiz.questions.length} questions)</span>
+                </div>
+                <button class="btn btn-primary" onclick="startQuiz(${quiz.id})">Play</button>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    // --- GAME LOGIC ---
+    function startQuiz(quizId) {
+        currentQuiz = quizzes.find(q => q.id === quizId);
+        currentQuestionIndex = 0;
+        score = 0;
+        
+        document.getElementById('gameTitle').innerText = currentQuiz.title;
+        document.getElementById('currentScore').innerText = '0';
+        document.getElementById('questionArea').style.display = 'block';
+        document.getElementById('resultArea').style.display = 'none';
+        
+        switchView('game');
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if(currentQuestionIndex >= currentQuiz.questions.length) {
+            endGame();
+            return;
+        }
+
+        const qData = currentQuiz.questions[currentQuestionIndex];
+        document.getElementById('questionText').innerText = `${currentQuestionIndex + 1}. ${qData.text}`;
+        
+        const optsDiv = document.getElementById('optionsArea');
+        optsDiv.innerHTML = '';
+
+        // Shuffle options for display
+        let displayOptions = [...qData.options].sort(() => Math.random() - 0.5);
+
+        displayOptions.forEach(optText => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = optText;
+            btn.onclick = () => handleAnswer(btn, optText, qData.correct);
+            optsDiv.appendChild(btn);
+        });
+    }
+
+    function handleAnswer(btn, selected, correct) {
+        // Disable all buttons
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        if(selected === correct) {
+            btn.classList.add('correct');
+            score += 10;
+            document.getElementById('currentScore').innerText = score;
+        } else {
+            btn.classList.add('wrong');
+            // Highlight correct answer
+            allBtns.forEach(b => {
+                if(b.innerText === correct) b.classList.add('correct');
+            });
+        }
+
+        setTimeout(() => {
+            currentQuestionIndex++;
+            loadQuestion();
+        }, 1500);
+    }
+
+    function endGame() {
+        document.getElementById('questionArea').style.display = 'none';
+        document.getElementById('resultArea').style.display = 'block';
+        document.getElementById('finalScore').innerText = score;
+    }
+
+    function saveScore() {
+        const name = document.getElementById('playerName').value || 'Anonymous';
+        scores.push({
+            quizId: currentQuiz.id,
+            quizTitle: currentQuiz.title,
+            player: name,
+            score: score,
+            date: new Date().toLocaleDateString()
+        });
+        localStorage.setItem('qm_scores', JSON.stringify(scores));
+        document.getElementById('playerName').value = '';
+        switchView('leaderboard');
+    }
+
+    // --- LEADERBOARD LOGIC ---
+    function renderLeaderboard() {
+        const filterId = document.getElementById('leaderboardFilter').value;
+        const tbody = document.getElementById('leaderboardBody');
+        tbody.innerHTML = '';
+
+        // Populate Filter Dropdown (only once or update if needed)
+        const filterSelect = document.getElementById('leaderboardFilter');
+        if(filterSelect.options.length === 1) {
+            quizzes.forEach(q => {
+                const opt = document.createElement('option');
+                opt.value = q.id;
+                opt.innerText = q.title;
+                filterSelect.appendChild(opt);
+            });
+        }
+
+        // Filter and Sort Scores
+        let displayScores = scores;
+        if(filterId !== 'all') {
+            displayScores = scores.filter(s => s.quizId == filterId);
+        }
+        
+        // Sort highest score first
+        displayScores.sort((a, b) => b.score - a.score);
+
+        displayScores.forEach(s => {
+            const row = `
+                <tr>
+                    <td>${s.player}</td>
+                    <td>${s.quizTitle}</td>
+                    <td><strong>${s.score}</strong></td>
+                    <td style="color:#666; font-size:0.8rem;">${s.date}</td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+    }
+
+    // Initialization
+    // Add a default quiz if none exist for demo purposes
+    if(quizzes.length === 0) {
+        quizzes.push({
+            id: 1,
+            title: "General Knowledge Demo",
+            questions: [
+                { text: "What is the capital of France?", correct: "Paris", options: ["Paris", "London", "Berlin", "Madrid"] },
+                { text: "Which planet is known as the Red Planet?", correct: "Mars", options: ["Mars", "Venus", "Jupiter", "Saturn"] }
+            ]
+        });
+        localStorage.setItem('qm_quizzes', JSON.stringify(quizzes));
+    }
+    
+    renderQuizList();
+
+</script>
+
+</body>
+</html>
